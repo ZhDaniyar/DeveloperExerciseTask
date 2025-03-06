@@ -1,6 +1,4 @@
-// LIST
-
-const data = [
+window.data = [
     {
         link: '#chair.html',
         title: 'Slim PRO',
@@ -73,52 +71,62 @@ const data = [
     },
 ];
 
-// SHOW
+const computerChairList = document.getElementById('computerChairList_____SHOW');
+const sortingOptions = document.querySelectorAll('.sorting_option li');
 
-let computerChairList = document.getElementById('computerChairList_____SHOW');
+const formatter = (priceSum) => {
+    return new Intl.NumberFormat('ru-RU').format(priceSum) + ' ₸';
+};
 
-displayList(data, computerChairList);
-
-function displayList(array, uniqId) {
-
-    uniqId.innerHTML = "";
-
-    array.map((a) => {
-
-        let formatter = function (priceSum) {
-            let price = priceSum.toString();
-            let formattedPrice = '';
-            for (let i = 0; i < price.length; i++) {
-                if (i > 0 && i % 3 === 0) {
-                    formattedPrice = ' ' + formattedPrice;
-                }
-                formattedPrice = price[price.length - 1 - i] + formattedPrice;
-            }
-            return formattedPrice;
-        };
-
+function displayList(array) {
+    computerChairList.innerHTML = "";
+    array.forEach(a => {
         let productItem = document.createElement('div');
-
         productItem.classList.add("product_item");
-
         productItem.innerHTML = `
-        <a class="product_item_content" href="${a.link}">
-            <img class="product_item_img" src="${a.img}" alt="Product">
-            <div class="product_item_text">
-                <h5>${a.title} | code: ${a.code}</h5>
-                <p>${a.desc}</p>
+            <a class="product_item_content" href="${a.link}">
+                <img class="product_item_img" src="${a.img}" alt="Product">
+                <div class="product_item_text">
+                    <h5>${a.title} | code: ${a.code}</h5>
+                    <p>${a.desc}</p>
+                </div>
+            </a>
+            <div class="product_item_price">
+                <span class="product_item_price_text">Цена:</span>
+                <br>
+                <span class="product_item_price_cost">${formatterCart(a.price)}</span>
+                <button class="product_item_price_btn add-to-cart-btn" data-code="${a.code}">В корзину</button>
             </div>
-        </a>
-        <div class="product_item_price">
-            <span class="product_item_price_text">Цена:</span>
-            <br>
-            <span class="product_item_price_cost">${formatter(a.price)} <span class="product_item_price_par">₸</span> </span>
-            <a class="product_item_price_btn" data-code="${a.code}">В корзину</a>
-        </div>
         `;
-
-        uniqId.appendChild(productItem);
-
+        computerChairList.appendChild(productItem);
     });
-
 }
+
+function sortProducts(criteria) {
+    let sortedData = [...data];
+
+    switch (criteria) {
+        case "по возрастанию цены":
+            sortedData.sort((a, b) => Number(a.price) - Number(b.price));
+            break;
+        case "по убыванию цены":
+            sortedData.sort((a, b) => Number(b.price) - Number(a.price));
+            break;
+        case "по коду":
+            sortedData.sort((a, b) => Number(a.code) - Number(b.code));
+            break;
+        case "по названию":
+            sortedData.sort((a, b) => a.title.localeCompare(b.title, 'ru'));
+            break;
+    }
+
+    displayList(sortedData);
+}
+
+sortingOptions.forEach(option => {
+    option.addEventListener("click", function () {
+        sortProducts(this.textContent.trim());
+    });
+});
+
+displayList(data);
